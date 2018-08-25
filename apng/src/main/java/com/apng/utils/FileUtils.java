@@ -11,7 +11,7 @@ import java.io.*;
 import java.net.*;
 
 /**
- * @author xing.hu@renren-inc.com
+ * @author xing.hu
  * @since 2016/3/26, 12:15
  */
 public class FileUtils {

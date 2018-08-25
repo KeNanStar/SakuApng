@@ -16,7 +16,7 @@ import java.util.concurrent.*;
 
 
 /**
- * @author xing.hu@renren-inc.com
+ * @author xing.hu
  * @since 2016/11/3, 下午3:07
  */
 public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
@@ -101,6 +101,7 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     protected void onAttachedToWindow() {
+        Log.d(TAG, "onAttachedToWindow()");
         super.onAttachedToWindow();
         mPlayThread = new PlayThread();
         mPlayThread.start();
@@ -124,6 +125,7 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         @Override
         public void run() {
+            Log.d(TAG, "PlayThread run()");
             mFrameRender = new ApngFrameRender();
             try {
                 while (!isInterrupted()) {
@@ -146,6 +148,7 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                             //mediaPlayer.stop();
                         }
                     } catch (InterruptedException e) {
+                        Log.e(TAG, Log.getStackTraceString(e));
                         break; // waiting in queue has been interrupted, finish play thread
                     }
                 }
@@ -203,7 +206,9 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     if (animItem.isHasBackground) setBgColor(false);
                 }
             } catch (IOException e) {
+                Log.e(TAG, Log.getStackTraceString(e));
             } catch (FormatNotSupportException e) {
+                Log.e(TAG, Log.getStackTraceString(e));
             }
         }
 

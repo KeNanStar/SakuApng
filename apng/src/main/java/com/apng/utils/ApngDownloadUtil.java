@@ -9,7 +9,7 @@ import android.util.*;
 import java.io.*;
 
 /**
- * @author xing.hu@renren-inc.com
+ * @author xing.hu
  * @since 2016/04/11, 14:25
  *  下载礼物动效apng类
  */

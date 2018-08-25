@@ -2,7 +2,7 @@ package com.apng.entity;
 
 
 /**
- * @author xing.hu@renren-inc.com
+ * @author xing.hu
  * @since 2016/5/24, 17:43
  */
 public class AnimParams {

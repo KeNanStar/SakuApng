@@ -3,7 +3,7 @@ package com.apng.utils;
 import android.graphics.*;
 
 /**
- * @author xing.hu@renren-inc.com
+ * @author xing.hu
  * @since 2016/11/9, 下午2:49
  * Apng动画播放工具类
  */
