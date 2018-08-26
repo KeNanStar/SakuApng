@@ -14,7 +14,7 @@ import java.io.File;
 public class MainActivity extends Activity{
     private ApngSurfaceView mApngSurfaceView;
     private static final  String COLOR_BALL_IMAGE_PATH = "assets://color_ball.png";
-    //private static final  String CAR_IMAGE_PATH = "assets://Car.png";
+    //private static final  String CAR_IMAGE_PATH = "assets://car.png";
 
 
     @Override

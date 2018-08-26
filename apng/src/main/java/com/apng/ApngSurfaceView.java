@@ -20,12 +20,12 @@ import java.util.concurrent.*;
  * @since 2016/11/3, 下午3:07
  */
 public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callback {
-    public static final String TAG = "ApngSurfaceView";
+    public static final String TAG = ApngSurfaceView.class.getSimpleName();
     private static final float DELAY_FACTOR = 1000F;
     public static boolean enableVerboseLog = false;
     public static int HALF_TRANSPARENT = Color.parseColor("#7F000000");
 
-    // SurfaceView通常需要自己单独的线程来播放动画
+    // start a thread to play the Apng Animation
     private PlayThread mPlayThread;
     private final LinkedBlockingQueue<AnimParams> queue = new LinkedBlockingQueue<>();
 
@@ -33,7 +33,7 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     public interface AnimationListener {
         /**
-         * 动画结束的回调
+         * call back when the anim plays complete
          */
         void onAnimationCompleted();
     }
@@ -77,7 +77,7 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
     }
 
     /**
-     * 添加要播放Apng动画到队列，会依次播放（本方法线程安全）
+     * add tha Apng Item to the queue
      */
     public void addApngForPlay(AnimParams giftAnimItem) {
         queue.add(giftAnimItem);
@@ -96,7 +96,6 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
     @Override
     public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
-        // 这里是SurfaceView发生变化的时候触发的部分
     }
 
     @Override
@@ -182,7 +181,7 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                             if (frame == null) break; // if read next frame failed, break loop
                             Bitmap frameBmp = BitmapFactory.decodeStream(frame.getImageStream());
                             //saveBitmap(frameBmp, i);
-                            Log.d(TAG, "读取第" + i + "帧所用的时间:" + (System.currentTimeMillis() - start) + "ms");
+                            Log.d(TAG, "read the " + i + " frame:" + (System.currentTimeMillis() - start) + "ms");
 
                             // init the render and calculate scale rate
                             // at first time get the frame width and height
@@ -236,7 +235,7 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
 
         /**
-         * 计算图片宽度跟画布宽度的比例(等宽缩放)
+         * calculate the ratio of image width to canvas
          */
         private float calculateScale(int scaleType, int imgW, int imgH, int viewW, int viewH) {
             if (scaleType == AnimParams.WIDTH_SCALE_TYPE) {
@@ -253,11 +252,11 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
 
         int index = 0;
         /**
-         * 绘制指定帧
+         * draw the appointed frame
          */
         private void drawFrame(AnimParams animItem, ApngFrame frame, Bitmap frameBmp) {
             if (surfaceEnabled && !isInterrupted()) {
-                //开始绘制每一帧
+                //start to draw the frame
                 try {
                     Matrix matrix = new Matrix();
                     matrix.setScale(mScale, mScale);
@@ -267,15 +266,15 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     index ++;
 
                     Canvas canvas = getHolder().lockCanvas();
-                    //消除锯齿
+                    //anti-aliasing
                     canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
                     float[] tranLeftAndTop = ApngUtils.getTranLeftAndTop(canvas, bmp, animItem.align, mScale, animItem.percent);
                     canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
                     matrix.postTranslate(tranLeftAndTop[0], tranLeftAndTop[1]);
                     canvas.drawBitmap(bmp, matrix, null);
-                    getHolder().unlockCanvasAndPost(canvas); // 释放锁并提交画布进行重绘
+                    getHolder().unlockCanvasAndPost(canvas); //  unlock the canvas
                 } catch (Exception e) {
-                    Log.d(TAG, "绘制出错");
+                    Log.e(TAG, "draw error msg:" + Log.getStackTraceString(e));
                 }
             }
         }
@@ -286,9 +285,9 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 try {
                     Canvas canvas = getHolder().lockCanvas();
                     canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-                    getHolder().unlockCanvasAndPost(canvas);//解锁画布，提交画好的图像
-                } catch (Exception e) {
-                    Log.d(TAG, "绘制出错");
+                    getHolder().unlockCanvasAndPost(canvas);//  unlock the canvas
+                }  catch (Exception e) {
+                    Log.e(TAG, "draw error msg:" + Log.getStackTraceString(e));
                 }
             }
         }
@@ -298,27 +297,4 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         }
     }
 
-
-    /** 保存方法 */
-    public void saveBitmap(Bitmap bm, int index) {
-        Log.e(TAG, "保存图片");
-        File f = new File("/sdcard/gen/", index + ".png");
-        if (f.exists()) {
-            f.delete();
-        }
-        try {
-            FileOutputStream out = new FileOutputStream(f);
-            bm.compress(Bitmap.CompressFormat.PNG, 90, out);
-            out.flush();
-            out.close();
-            Log.i(TAG, "已经保存");
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
 }
