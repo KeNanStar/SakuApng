@@ -180,7 +180,6 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                             ApngFrame frame = reader.nextFrame();
                             if (frame == null) break; // if read next frame failed, break loop
                             Bitmap frameBmp = BitmapFactory.decodeStream(frame.getImageStream());
-                            //saveBitmap(frameBmp, i);
                             Log.d(TAG, "read the " + i + " frame:" + (System.currentTimeMillis() - start) + "ms");
 
                             // init the render and calculate scale rate
