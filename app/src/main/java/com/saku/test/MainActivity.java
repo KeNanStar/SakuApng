@@ -13,8 +13,8 @@ import java.io.File;
 
 public class MainActivity extends Activity{
     private ApngSurfaceView mApngSurfaceView;
-    private static final  String COLOR_BALL_IMAGE_PATH = "assets://color_ball.png";
-    //private static final  String CAR_IMAGE_PATH = "assets://car.png";
+    //private static final  String COLOR_BALL_IMAGE_PATH = "assets://color_ball.png";
+    private static final  String CAR_IMAGE_PATH = "assets://car.png";
 
 
     @Override
@@ -33,7 +33,7 @@ public class MainActivity extends Activity{
 
 
     private void playAnim(){
-        File file = FileUtils.processApngFile(COLOR_BALL_IMAGE_PATH, this);
+        File file = FileUtils.processApngFile(CAR_IMAGE_PATH, this);
         if(file == null) return;
         AnimParams animItem = new AnimParams();
         animItem.align = 2;

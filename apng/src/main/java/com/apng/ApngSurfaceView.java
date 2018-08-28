@@ -117,6 +117,7 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
         private volatile boolean surfaceEnabled;
         private ApngFrameRender mFrameRender;
         private float mScale;
+        private  static final int MAX_ZERO_NUM = 3;
 
         public PlayThread() {
             Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
@@ -164,7 +165,6 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                 // step 1: prepare
                 ApngReader reader = new ApngReader(animItem.imagePath);
                 ApngACTLChunk actl = reader.getACTL();
-                try {
                     if (animItem.isHasBackground) setBgColor(true);
                     // all loop count = apng_internal_loop_count x apng_play_times
                     // if apng_internal_loop_count == 0 then set it to 1 (not support loop indefinitely)
@@ -179,34 +179,42 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                             // get frame data
                             ApngFrame frame = reader.nextFrame();
                             if (frame == null) break; // if read next frame failed, break loop
-                            Bitmap frameBmp = BitmapFactory.decodeStream(frame.getImageStream());
-                            Log.d(TAG, "read the " + i + " frame:" + (System.currentTimeMillis() - start) + "ms");
 
-                            // init the render and calculate scale rate
-                            // at first time get the frame width and height
-                            if (lc == 0 && i == 0) {
-                                int imgW = frame.getWidth(), imgH = frame.getHeight();
-                                mScale = calculateScale(animItem.scaleType, imgW, imgH, getWidth(), getHeight());
-                                mFrameRender.prepare(imgW, imgH);
+                            byte[] data = readStream(frame.getImageStream());
+
+                            if(data!=null){
+                                //Bitmap frameBmp = BitmapFactory.decodeStream(frame.getImageStream());
+
+                                Bitmap frameBmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+
+                                Log.d(TAG, "read the " + i + " frame:" + (System.currentTimeMillis() - start) + "ms");
+
+                                // init the render and calculate scale rate
+                                // at first time get the frame width and height
+                                if (lc == 0 && i == 0) {
+                                    int imgW = frame.getWidth(), imgH = frame.getHeight();
+                                    mScale = calculateScale(animItem.scaleType, imgW, imgH, getWidth(), getHeight());
+                                    mFrameRender.prepare(imgW, imgH);
+                                }
+
+                                // draw frame
+                                drawFrame(animItem, frame, frameBmp);
+                                frameBmp.recycle();
+
+                                // delay
+                                int waitMillis = Math.round(frame.getDelayNum() * DELAY_FACTOR / frame.getDelayDen())
+                                        - (int) (System.currentTimeMillis() - start);
+                                sleep(waitMillis > 0 ? waitMillis : 0);
                             }
 
-                            // draw frame
-                            drawFrame(animItem, frame, frameBmp);
-                            frameBmp.recycle();
-
-                            // delay
-                            int waitMillis = Math.round(frame.getDelayNum() * DELAY_FACTOR / frame.getDelayDen())
-                                    - (int) (System.currentTimeMillis() - start);
-                            sleep(waitMillis > 0 ? waitMillis : 0);
                         }
                     }
-                } finally {
-                    if (animItem.isHasBackground) setBgColor(false);
-                }
-            } catch (IOException e) {
+
+            } catch (Exception e) {
                 Log.e(TAG, Log.getStackTraceString(e));
-            } catch (FormatNotSupportException e) {
-                Log.e(TAG, Log.getStackTraceString(e));
+            }
+            finally {
+                if (animItem.isHasBackground) setBgColor(false);
             }
         }
 
@@ -231,6 +239,52 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                         mListener.onAnimationCompleted();
                 }
             });
+        }
+
+        /*
+         * get image byte stream
+         * */
+        private byte[] readStream(InputStream inStream) throws Exception {
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len = 0;
+
+            //fix bug: the end of inputStream while return 0 if the type of phone is Meizu MEIZU E3
+            int numZero = 0;
+
+            while ((len = inStream.read(buffer)) != -1) {
+                outStream.write(buffer, 0, len);
+                if(len == 0 ) {
+                    numZero++;
+                    if(numZero >=  MAX_ZERO_NUM){
+                        break;
+                    }
+                }
+            }
+            outStream.close();
+            inStream.close();
+            return outStream.toByteArray();
+        }
+
+        public class PatchInputStream extends FilterInputStream{
+
+            protected PatchInputStream(InputStream in) {
+                super(in);
+                // TODO Auto-generated constructor stub
+            }
+
+            public long skip(long n)throws IOException{
+                long m=0l;
+                while(m<n){
+                    long _m=in.skip(n-m);
+                    if(_m==0l){
+                        break;
+                    }
+                    m+=_m;
+                }
+                return m;
+            }
+
         }
 
         /**
