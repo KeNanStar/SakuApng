@@ -54,7 +54,7 @@ public class AnimParams {
 
 
     /**
-     * 守护骑士分片特效执行次数
+     * 动画执行次数
      */
     public int loopCount = 1;
 

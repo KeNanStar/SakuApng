@@ -33,16 +33,16 @@ public class MainActivity extends Activity{
 
 
     private void playAnim(){
-        File file = FileUtils.processApngFile(COLOR_BALL_IMAGE_PATH, this);
+        //File file = FileUtils.processApngFile(COLOR_BALL_IMAGE_PATH, this);
         File file1 = FileUtils.processApngFile(CAR_IMAGE_PATH, this);
 
-        if(file == null) return;
+      /*  if(file == null) return;
         AnimParams animItem = new AnimParams();
         animItem.align = 2;
         animItem.imagePath = file.getAbsolutePath();
         animItem.isHasBackground = true;
         animItem.percent = 0.5f;
-        mApngSurfaceView.addApngForPlay(animItem);
+        mApngSurfaceView.addApngForPlay(animItem);*/
 
 
         AnimParams animItem1 = new AnimParams();
@@ -50,6 +50,7 @@ public class MainActivity extends Activity{
         animItem1.imagePath = file1.getAbsolutePath();
         animItem1.isHasBackground = true;
         animItem1.percent = 0.5f;
+        animItem1.loopCount = 3;
         mApngSurfaceView.addApngForPlay(animItem1);
     }
 }
