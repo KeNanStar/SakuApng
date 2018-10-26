@@ -20,10 +20,17 @@ public class AnimParams {
      */
     public static final int WIDTH_OR_HEIGHT_SCALE_TYPE = 0x0100;
 
+
     /**
      * 缩放比例
      */
     public int scaleType = WIDTH_SCALE_TYPE;
+
+
+    /**
+     * 一直循环播放
+     */
+    public static int PLAY_4_LOOP = -1;
 
     /**
      * 对齐方式

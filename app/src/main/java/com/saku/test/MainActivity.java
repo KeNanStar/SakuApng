@@ -50,7 +50,7 @@ public class MainActivity extends Activity{
         animItem1.imagePath = file1.getAbsolutePath();
         animItem1.isHasBackground = true;
         animItem1.percent = 0.5f;
-        animItem1.loopCount = 3;
+        animItem1.loopCount = AnimParams.PLAY_4_LOOP;
         mApngSurfaceView.addApngForPlay(animItem1);
     }
 }

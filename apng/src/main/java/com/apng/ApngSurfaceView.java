@@ -171,9 +171,11 @@ public class ApngSurfaceView extends SurfaceView implements SurfaceHolder.Callba
                     int loopCount = animItem.loopCount * (actl.getNumPlays() == 0 ? 1 : actl.getNumPlays());
 
                     // step 2: draw frames
-                    for (int lc = 0; lc < loopCount; lc++) {
+                    boolean isLoop = loopCount == AnimParams.PLAY_4_LOOP ;
+
+                    for (int lc = 0; lc < loopCount || isLoop; lc++) {
                         // reallocated to head again if loops more the one time
-                        if (lc > 0) reader.reset();
+                        if (lc > 0 || isLoop) reader.reset();
                         for (int i = 0; i < actl.getNumFrames(); i++) {
                             long start = System.currentTimeMillis();
                             // get frame data
