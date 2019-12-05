@@ -23,5 +23,5 @@ Apng的解析主要是将Apng文件转化成Apng序列帧Frame-n，从上面的�
 
 # ApngReader的实现
 
-方案一的具体实现大家可以参考github上面的一个项目[**apng-view**](https://github.com/sahasbhop/apng-view)，方案二的具体实现，即ApngReader的实现参加简书[**Android-Apng动画的播放**](https://www.jianshu.com/p/8114ed31c535)。
+方案一的具体实现大家可以参考github上面的一个项目[**apng-view**](https://github.com/sahasbhop/apng-view)，方案二的具体实现，即ApngReader的实现参见简书[**Android-Apng动画的播放**](https://www.jianshu.com/p/8114ed31c535)。
 
