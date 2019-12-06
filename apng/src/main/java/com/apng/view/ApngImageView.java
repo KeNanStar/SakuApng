@@ -34,6 +34,7 @@ import java.lang.ref.WeakReference;
 /**
  * @author xing.hu
  * @since 2016/11/3, 下午3:07
+ * ImageView support Apng play
  */
 public class ApngImageView extends ImageView implements Animatable {
     public static final String TAG = ApngImageView.class.getSimpleName();
