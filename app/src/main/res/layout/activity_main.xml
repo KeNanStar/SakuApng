@@ -1,21 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@android:color/white"
     tools:context=".MainActivity">
 
-    <com.apng.view.ApngSurfaceView
-        android:id="@+id/apng_surface_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center" />
+
     <Button
-        android:id="@+id/start_play"
-        android:text="@string/play"
+        android:id="@+id/image_view_btn"
+        android:text="imageView 支持 Apng"
+        android:textSize="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        />
+
+    <Button
+        android:id="@+id/surface_view_btn"
+        android:text="surfaceView 支持 Apng"
+        android:textSize="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-</RelativeLayout>
+
+
+</LinearLayout>
