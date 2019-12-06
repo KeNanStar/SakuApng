@@ -7,7 +7,7 @@
     android:background="@android:color/white"
     tools:context=".MainActivity">
 
-    <com.apng.ApngSurfaceView
+    <com.apng.view.ApngSurfaceView
         android:id="@+id/apng_surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

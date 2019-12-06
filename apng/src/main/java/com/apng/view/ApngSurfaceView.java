@@ -1,12 +1,15 @@
-package com.apng;
+package com.apng.view;
 
 import android.content.*;
 import android.graphics.*;
-import android.media.*;
 import android.os.Process;
 import android.util.*;
 import android.view.*;
 
+import com.apng.ApngACTLChunk;
+import com.apng.ApngFrame;
+import com.apng.ApngFrameRender;
+import com.apng.ApngReader;
 import com.apng.entity.AnimParams;
 import com.apng.utils.ApngUtils;
 

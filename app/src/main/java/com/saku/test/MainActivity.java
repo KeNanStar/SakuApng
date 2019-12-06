@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.apng.ApngSurfaceView;
+import com.apng.view.ApngSurfaceView;
 import com.apng.entity.AnimParams;
 import com.apng.utils.FileUtils;
 
