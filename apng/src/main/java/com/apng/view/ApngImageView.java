@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
-import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Animatable;
 import android.os.Handler;
@@ -16,8 +15,6 @@ import android.os.Message;
 import android.os.Process;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.widget.ImageView;
 
 import com.apng.ApngACTLChunk;
@@ -32,7 +29,6 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
@@ -42,31 +38,24 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class ApngImageView extends ImageView implements Animatable {
     public static final String TAG = ApngImageView.class.getSimpleName();
     private static final float DELAY_FACTOR = 1000F;
-    public static boolean enableVerboseLog = false;
     public static int HALF_TRANSPARENT = Color.parseColor("#7F000000");
 
     // start a thread to play the Apng Animation
-    private PlayThread mPlayThread;
+
     private AnimParams mAnimParams;
 
-    private float mScale;
-
-    private ApngFrameRender mFrameRender;
-
-
-    private ApngFrame curFrame;
-
-    private Bitmap curFrameBmp;
-
-    private boolean mIsRunning = false;
-
+    //apng assist class,  support apng Render
+    private ApngPlayAssist mApngPlayAssist;
 
     private ApngHandler mApngHandler;
+
+    private volatile AnimationListener mListener;
+
+    private volatile  int mStep = ApngLoader.Const.STEP_DEFAULT;
 
 
     private static class ApngHandler extends Handler {
         private WeakReference<ApngImageView> mRef;
-
 
         public ApngHandler(ApngImageView apngImageView) {
             mRef = new WeakReference<>(apngImageView);
@@ -80,23 +69,16 @@ public class ApngImageView extends ImageView implements Animatable {
     }
 
 
-    private volatile AnimationListener mListener;
-
     @Override
     public void start() {
-        mIsRunning = true;
-        mPlayThread = new PlayThread();
-        mPlayThread.start();
+        mApngPlayAssist.play();
+
     }
 
     @Override
     public void stop() {
-        if (mPlayThread != null) {
-            mPlayThread.interrupt();
-            mPlayThread = null;
-        }
-        //clearCanvas();
-        //notifyPlayCompeleted();
+        mApngPlayAssist.stop();
+
     }
 
     @Override
@@ -135,36 +117,40 @@ public class ApngImageView extends ImageView implements Animatable {
     }
 
 
+
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        switch (mStep){
+            case ApngLoader.Const.STEP_CLEAR_CANVAS:
+                 mApngPlayAssist.clearCanvas(canvas);
+                break;
+            case ApngLoader.Const.STEP_DRAW_FRAME:
+                mApngPlayAssist.drawFrame(canvas);
+                break;
+           default:
+               break;
 
-        if(mIsRunning
-            && mFrameRender != null
-             && curFrame != null
-               && curFrameBmp != null){
-            drawFrame(canvas);
         }
-
-
 
     }
 
     private void init(Context context) {
-
+        mApngPlayAssist = new ApngPlayAssist();
         mApngHandler = new ApngHandler(this);
         setLayerType(LAYER_TYPE_HARDWARE, null);
-        enableVerboseLog = true;
+        mStep = ApngLoader.Const.STEP_DEFAULT;
 
 
     }
-
 
     /**
      * set tha Apng Item to the queue
      */
     public void setApngForPlay(AnimParams animItem) {
         mAnimParams = animItem;
+        mStep = ApngLoader.Const.STEP_DEFAULT;
     }
 
 
@@ -177,35 +163,65 @@ public class ApngImageView extends ImageView implements Animatable {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (mPlayThread != null) {
-            mPlayThread.interrupt();
-            mPlayThread = null;
-        }
+        mApngPlayAssist.detach();
+
     }
 
-    private class PlayThread extends Thread {
+
+
+
+    private class ApngPlayAssist implements Runnable {
+
+        private float mScale;
+
+        private ApngFrameRender mFrameRender;
+
+        private ApngFrame curFrame;
+
+        private Bitmap curFrameBmp;
+
+        private volatile boolean mIsPlay = false;
+
         private static final int MAX_ZERO_NUM = 3;
 
-        public PlayThread() {
-            Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+
+        private void play() {
+            mIsPlay = true;
+            ApngLoader.getInstance().getExecutor().execute(this);
         }
+
+
+        private void stop() {
+            mIsPlay = false;
+            mStep = ApngLoader.Const.STEP_CLEAR_CANVAS;
+            notifyPlayCompeleted();
+        }
+
+
+        private void detach(){
+            if(mIsPlay) {
+                mIsPlay = false;
+                ApngLoader.getInstance().getExecutor().remove(this);
+            }
+        }
+
 
         @Override
         public void run() {
+            if (mAnimParams == null) {
+                return;
+            }
             Log.d(TAG, "PlayThread run()");
-            mFrameRender = new ApngFrameRender();
             try {
-                while (!isInterrupted()) {
-                    try {
-                        //  play it
-                        playAnimation(mAnimParams);
+                // play it
+                playAnimation();
 
+                // play end
+                stop();
 
-                    } catch (InterruptedException e) {
-                        Log.e(TAG, Log.getStackTraceString(e));
-                        break; // waiting in queue has been interrupted, finish play thread
-                    }
-                }
+            } catch (InterruptedException e) {
+                Log.e(TAG, Log.getStackTraceString(e));
+
             } finally {
                 mFrameRender.recycle();
             }
@@ -214,15 +230,16 @@ public class ApngImageView extends ImageView implements Animatable {
         /**
          * play the apng animation
          */
-        private void playAnimation(AnimParams animItem) throws InterruptedException {
+        private void playAnimation() throws InterruptedException {
             try {
+                mFrameRender = new ApngFrameRender();
                 // step 1: prepare
-                ApngReader reader = new ApngReader(animItem.imagePath);
+                ApngReader reader = new ApngReader(mAnimParams.imagePath);
                 ApngACTLChunk actl = reader.getACTL();
-                if (animItem.isHasBackground) setBgColor(true);
+                if (mAnimParams.isHasBackground) setBgColor(true);
                 // all loop count = apng_internal_loop_count x apng_play_times
                 // if apng_internal_loop_count == 0 then set it to 1 (not support loop indefinitely)
-                int loopCount = animItem.loopCount * (actl.getNumPlays() == 0 ? 1 : actl.getNumPlays());
+                int loopCount = mAnimParams.loopCount * (actl.getNumPlays() == 0 ? 1 : actl.getNumPlays());
 
                 // step 2: draw frames
                 boolean isLoop = loopCount == AnimParams.PLAY_4_LOOP;
@@ -249,21 +266,19 @@ public class ApngImageView extends ImageView implements Animatable {
                             // at first time get the frame width and height
                             if (lc == 0 && i == 0) {
                                 int imgW = curFrame.getWidth(), imgH = curFrame.getHeight();
-                                mScale = calculateScale(animItem.scaleType, imgW, imgH, getWidth(), getHeight());
+                                mScale = calculateScale(mAnimParams.scaleType, imgW, imgH, getWidth(), getHeight());
                                 mFrameRender.prepare(imgW, imgH);
                             }
 
 
-                            // draw frame
-                            if (!isInterrupted()) {
-                                index++;
-                                ApngImageView.this.postInvalidate();
-                            }
+                            index++;
+                            mStep = ApngLoader.Const.STEP_DRAW_FRAME;
+                            ApngImageView.this.postInvalidate();
 
                             // delay
                             int waitMillis = Math.round(curFrame.getDelayNum() * DELAY_FACTOR / curFrame.getDelayDen())
                                     - (int) (System.currentTimeMillis() - start);
-                            sleep(waitMillis > 0 ? waitMillis : 0);
+                            Thread.sleep(waitMillis > 0 ? waitMillis : 0);
                         }
 
                     }
@@ -272,7 +287,7 @@ public class ApngImageView extends ImageView implements Animatable {
             } catch (Exception e) {
                 Log.e(TAG, Log.getStackTraceString(e));
             } finally {
-                if (animItem.isHasBackground) setBgColor(false);
+                if (mAnimParams.isHasBackground) setBgColor(false);
             }
         }
 
@@ -364,41 +379,55 @@ public class ApngImageView extends ImageView implements Animatable {
         int index = 0;
 
 
-    }
+        /**
+         * draw the appointed frame
+         */
+        private void drawFrame(Canvas canvas) {
+
+            if (mIsPlay
+                    && mFrameRender != null
+                    && curFrame != null
+                    && curFrameBmp != null) {
+
+                //start to draw the frame
+                try {
+                    Matrix matrix = new Matrix();
+                    matrix.setScale(mScale, mScale);
+                    Bitmap bmp = mFrameRender.render(curFrame, curFrameBmp);
+
+                    //saveBitmap(bmp, index);
 
 
-    /**
-     * draw the appointed frame
-     */
-    private void drawFrame(Canvas canvas) {
-        //start to draw the frame
-        try {
-            Matrix matrix = new Matrix();
-            matrix.setScale(mScale, mScale);
-            Bitmap bmp = mFrameRender.render(curFrame, curFrameBmp);
-
-            //saveBitmap(bmp, index);
-
-
-            //anti-aliasing
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            float[] tranLeftAndTop = ApngUtils.getTranLeftAndTop(canvas, bmp, mAnimParams.align, mScale, mAnimParams.percent);
-            canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
-            matrix.postTranslate(tranLeftAndTop[0], tranLeftAndTop[1]);
-            canvas.drawBitmap(bmp, matrix, null);
-            curFrameBmp.recycle();
-        } catch (Exception e) {
-            Log.e(TAG, "draw error msg:" + Log.getStackTraceString(e));
+                    //anti-aliasing
+                    canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+                    float[] tranLeftAndTop = ApngUtils.getTranLeftAndTop(canvas, bmp, mAnimParams.align, mScale, mAnimParams.percent);
+                    canvas.setDrawFilter(new PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG));
+                    matrix.postTranslate(tranLeftAndTop[0], tranLeftAndTop[1]);
+                    canvas.drawBitmap(bmp, matrix, null);
+                    curFrameBmp.recycle();
+                } catch (Exception e) {
+                    Log.e(TAG, "draw error msg:" + Log.getStackTraceString(e));
+                }
+            }
         }
-    }
 
 
-    private void clearCanvas(Canvas canvas) {
-        try {
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        } catch (Exception e) {
-            Log.e(TAG, "draw error msg:" + Log.getStackTraceString(e));
+        /**
+         * clear canvas
+         *
+         * @param canvas
+         */
+        public void clearCanvas(Canvas canvas) {
+            try {
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            } catch (Exception e) {
+                Log.e(TAG, "draw error msg:" + Log.getStackTraceString(e));
+            }
         }
+
+
+
     }
+
 
 }
