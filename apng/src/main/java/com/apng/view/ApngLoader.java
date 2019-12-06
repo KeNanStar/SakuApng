@@ -1,5 +1,7 @@
 package com.apng.view;
 
+import com.apng.entity.AnimParams;
+
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -29,6 +31,16 @@ public class ApngLoader {
         return Holder.apngLoader;
 
     }
+
+    public  void loadApng(String apngPath, ApngImageView view){
+        AnimParams animItem1 = new AnimParams();
+        animItem1.imagePath = apngPath;
+        animItem1.loopCount = AnimParams.PLAY_4_LOOP;
+        view.setApngForPlay(animItem1);
+        view.start();
+
+    }
+
 
 
     public  ScheduledThreadPoolExecutor getExecutor(){

@@ -8,6 +8,7 @@ import android.widget.Button;
 import com.apng.entity.AnimParams;
 import com.apng.utils.FileUtils;
 import com.apng.view.ApngImageView;
+import com.apng.view.ApngLoader;
 
 import java.io.File;
 
@@ -36,22 +37,7 @@ public class ApngImageViewActivity extends Activity{
         //File file = FileUtils.processApngFile(COLOR_BALL_IMAGE_PATH, this);
         File file1 = FileUtils.processApngFile(COLOR_BALL_IMAGE_PATH, this);
 
-      /*  if(file == null) return;
-        AnimParams animItem = new AnimParams();
-        animItem.align = 2;
-        animItem.imagePath = file.getAbsolutePath();
-        animItem.isHasBackground = true;
-        animItem.percent = 0.5f;
-        mApngImageView.addApngForPlay(animItem);*/
+        ApngLoader.getInstance().loadApng(file1.getAbsolutePath(), mApngImageView);
 
-
-        AnimParams animItem1 = new AnimParams();
-        animItem1.align = 2;
-        animItem1.imagePath = file1.getAbsolutePath();
-        animItem1.isHasBackground = true;
-        animItem1.percent = 0.5f;
-        animItem1.loopCount = AnimParams.PLAY_4_LOOP;
-        mApngImageView.setApngForPlay(animItem1);
-        mApngImageView.start();
     }
 }
