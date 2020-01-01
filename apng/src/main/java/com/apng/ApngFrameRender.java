@@ -62,10 +62,10 @@ public class ApngFrameRender {
      * 不再使用时，回收资源
      */
     public void recycle() {
-        if (mRenderFrame != null) {
-            mRenderFrame.recycle();
-            mDisposedFrame.recycle();
-        }
+        //if (mRenderFrame != null) {
+        //    mRenderFrame.recycle();
+        //    mDisposedFrame.recycle();
+        //}
     }
 
     /**
