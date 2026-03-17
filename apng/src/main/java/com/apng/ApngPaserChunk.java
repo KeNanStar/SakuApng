@@ -5,8 +5,8 @@ import static com.apng.ApngConst.*;
 /**
  * Apng Chunk Parser
  *
- * @author ltf
- * @since 16/11/26, 下午12:09
+ *
+ * @since 2026/3/17, 下午12:09
  */
 abstract class ApngPaserChunk extends ApngChunk implements ApngDataSupplier {
     // chunk start offset, SHOULD NOT CHANGE AFTER PARSE PREPARED

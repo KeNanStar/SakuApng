@@ -1,11 +1,10 @@
-package com.saku.test;
+package com.apngparse.test;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 
-import com.apng.entity.AnimParams;
 import com.apng.utils.FileUtils;
 import com.apng.view.ApngImageView;
 import com.apng.view.ApngLoader;

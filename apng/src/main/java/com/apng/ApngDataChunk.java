@@ -3,8 +3,8 @@ package com.apng;
 /**
  * Apng Chunk as data container
  *
- * @author ltf
- * @since 16/11/29, 下午12:16
+ *
+ * @since 2026/3/17, 下午12:16
  */
 public abstract class ApngDataChunk extends ApngChunk {
 

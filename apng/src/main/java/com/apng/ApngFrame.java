@@ -5,8 +5,8 @@ import java.io.*;
 /**
  * Apng Frame Data
  *
- * @author ltf
- * @since 16/11/28, 下午1:15
+ *
+ * @since 2026/3/17, 下午1:15
  */
 public class ApngFrame extends ApngFCTLChunk {
 

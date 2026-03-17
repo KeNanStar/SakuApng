@@ -7,8 +7,8 @@ import static com.apng.ApngFCTLChunk.*;
 /**
  * 帧图像合成器
  *
- * @author ltf
- * @since 16/12/2, 上午9:10
+ *
+ * @since 2026/3/17, 上午9:10
  */
 public class ApngFrameRender {
     private Rect mFullRect = new Rect();

@@ -1,4 +1,4 @@
-package com.saku.test;
+package com.apngparse.test;
 
 import android.app.Activity;
 import android.os.Bundle;

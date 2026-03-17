@@ -3,8 +3,8 @@ package com.apng;
 /**
  * ACTL chunk
  *
- * @author ltf
- * @since 16/11/28, 下午12:09
+ *
+ * @since 2026/3/17, 下午12:09
  */
 public class ApngACTLChunk extends ApngDataChunk {
     private int numFrames;

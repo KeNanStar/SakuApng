@@ -1,16 +1,9 @@
-package com.saku.test;
+package com.apngparse.test;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-
-import com.apng.view.ApngSurfaceView;
-import com.apng.entity.AnimParams;
-import com.apng.utils.FileUtils;
-
-import java.io.File;
 
 public class MainActivity extends Activity{
 

@@ -3,8 +3,8 @@ package com.apng;
 /**
  * IDHR Chunk
  *
- * @author ltf
- * @since 16/11/30, 下午4:45
+ *
+ * @since 2026/3/17, 下午4:45
  */
 public class ApngIHDRChunk extends ApngDataChunk {
     private int width;

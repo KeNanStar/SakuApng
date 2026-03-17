@@ -6,8 +6,8 @@ import java.nio.*;
 /**
  * Parsable Apng Chunk Over MappedByteBuffer
  *
- * @author ltf
- * @since 16/11/26, 下午12:11
+ *
+ * @since 2026/3/17, 下午12:11
  */
 public class ApngMmapParserChunk extends ApngPaserChunk {
     // data buffer

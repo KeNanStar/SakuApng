@@ -8,8 +8,8 @@ import static com.apng.PngStream.*;
 /**
  * convert fdAT chunk to IDAT chunk stream
  *
- * @author ltf
- * @since 16/12/2, 下午3:56
+ *
+ * @since 2026/3/17, 下午3:56
  */
 public class Fdat2IdatChunk extends ApngMmapParserChunk {
     private int mDataSigOff; // signature "fdAT" 's  offset

@@ -1,8 +1,9 @@
 package com.apng;
 
 /**
- * @author ltf
- * @since 16/11/29, 下午12:32
+ *  Apng Read Interface
+ *
+ * @since 2026/3/17, 下午12:32
  */
 public interface ApngDataSupplier {
 

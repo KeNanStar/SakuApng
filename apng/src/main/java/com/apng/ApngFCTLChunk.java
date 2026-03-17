@@ -3,8 +3,8 @@ package com.apng;
 /**
  * FCTL Chunk
  *
- * @author ltf
- * @since 16/11/28, 下午12:10
+ *
+ * @since 2026/3/17, 下午12:10
  */
 public class ApngFCTLChunk extends ApngDataChunk {
 

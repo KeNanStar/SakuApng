@@ -7,8 +7,8 @@ import java.util.zip.*;
 /**
  * Png Stream Constructor to make png stream from apng frame
  *
- * @author ltf
- * @since 16/11/28, 上午8:20
+ *
+ * @since 2026/3/17, 上午8:20
  */
 public class PngStream extends InputStream {
     // fast data

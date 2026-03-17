@@ -10,8 +10,8 @@ import static com.apng.ApngConst.*;
 /**
  * Apng加载器（从Apng文件中读取每一帧的控制块及图像）
  *
- * @author ltf
- * @since 16/11/25, 上午8:14
+ *
+ * @since 2026/3/17, 上午8:14
  */
 public class ApngReader {
 

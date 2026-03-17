@@ -1,10 +1,10 @@
 package com.apng;
 
 /**
- * Base APng Chunk Object
+ * Base Apng Chunk Object
  *
- * @author ltf
- * @since 16/11/26, 上午11:19
+ *
+ * @since 2026/3/17, 上午11:19
  */
 abstract class ApngChunk {
 

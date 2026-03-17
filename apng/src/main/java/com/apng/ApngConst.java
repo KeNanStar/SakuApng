@@ -3,8 +3,8 @@ package com.apng;
 /**
  * Apng Const
  *
- * @author ltf
- * @since 16/11/26, 下午3:26
+ *
+ * @since 2026/3/17, 下午3:26
  */
 public class ApngConst {
     // signature
